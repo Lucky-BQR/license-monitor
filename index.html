@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公司牌照监控系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            color: #8892b0;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .card {
+            display: block;
+            padding: 20px 28px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            text-decoration: none;
+            color: #ccd6f6;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: #64ffda;
+            transform: translateY(-2px);
+            color: #64ffda;
+        }
+        .card .title {
+            font-size: 1.15em;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .card .desc {
+            font-size: 0.85em;
+            color: #8892b0;
+        }
+        .card:hover .desc {
+            color: #a8b2d1;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            font-size: 0.7em;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .tag-web { background: rgba(100,255,218,0.15); color: #64ffda; }
+        .tag-wire { background: rgba(255,183,77,0.15); color: #ffb74d; }
+        .tag-mobile { background: rgba(130,177,255,0.15); color: #82b1ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 公司牌照监控系统</h1>
+        <p class="subtitle">License Monitoring System — 原型与驾驶舱演示</p>
+        <div class="cards">
+            <a class="card" href="公司牌照监控系统-牌照驾驶舱V2.html">
+                <div class="title">牌照驾驶舱 V2 <span class="tag tag-web">Web</span></div>
+                <div class="desc">PC 端牌照驾驶舱总览仪表盘</div>
+            </a>
+            <a class="card" href="公司牌照监控系统-原型线框图.html">
+                <div class="title">原型线框图 <span class="tag tag-wire">Wireframe</span></div>
+                <div class="desc">完整交互原型与页面线框图</div>
+            </a>
+            <a class="card" href="牌照监控系统-牌照驾驶舱-移动端.html">
+                <div class="title">移动端驾驶舱 <span class="tag tag-mobile">Mobile</span></div>
+                <div class="desc">移动端牌照监控驾驶舱</div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

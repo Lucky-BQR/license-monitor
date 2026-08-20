@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>牌照監控駕駛艙 · 移動端 | C-SMART 投標管理平台</title>
+<style>
+/* ==================== 设计令牌（与UI规范一致） ==================== */
+:root{
+  --m-bg:#eef4fb;
+  --m-surface:#ffffff;
+  --m-primary:#2786d8;
+  --m-primary-dark:#1a6bb8;
+  --m-text:#1a2b3c;
+  --m-text-2:#3d454d;
+  --m-text-3:#6b7a8d;
+  --m-text-muted:#9aa8b8;
+  --m-line:#e3edf7;
+  --m-success:#4acb83;
+  --m-warn:#e8930c;
+  --m-danger:#ff5b5b;
+  --m-purple:#9333ea;
+  --m-radius:14px;
+  --m-shadow:0 2px 10px rgba(39,134,216,.08);
+  --font-ui:"PingFang SC",MiSans,"Microsoft YaHei",Arial,sans-serif;
+  --font-num:"D-DIN-PRO","Arial Narrow",Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;min-height:100%;}
+body{
+  background:var(--m-bg);
+  color:var(--m-text);
+  font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+svg{display:block;}
+
+/* 手机容器：桌面访问时居中显示手机宽度 */
+.m-app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--m-bg);position:relative;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+
+/* ==================== 顶部导航（参考平台移动端样式） ==================== */
+.m-navbar{
+  position:sticky;top:0;z-index:50;
+  height:48px;display:flex;align-items:center;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--m-line);
+  padding:0 8px;
+}
+.m-nav-back{
+  width:36px;height:36px;display:grid;place-items:center;color:var(--m-text);
+}
+.m-nav-back svg{width:20px;height:20px;}
+.m-nav-title{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-size:16px;font-weight:600;color:var(--m-text);white-space:nowrap;
+}
+.m-nav-more{
+  margin-left:auto;width:36px;height:36px;display:grid;place-items:center;color:var(--m-text);
+}
+.m-nav-more svg{width:20px;height:20px;}
+
+/* ==================== 蓝色波浪横幅（平台统一头部样式） ==================== */
+.m-banner{
+  margin:0;
+  height:78px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#e3f0fc 0%,#cfe6fa 55%,#c2e0f9 100%);
+}
+.m-banner .wave{
+  position:absolute;left:0;right:0;bottom:0;width:100%;height:100%;
+  pointer-events:none;
+}
+.m-banner-title{
+  position:absolute;left:50%;top:20px;transform:translateX(-50%);
+  font-size:19px;font-weight:700;color:#2f6ea8;letter-spacing:.06em;
+  white-space:nowrap;z-index:2;
+}
+.m-banner-pill{
+  position:absolute;top:26px;z-index:3;
+  min-width:76px;height:34px;padding:0 10px;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:7px;
+  color:#4e8eb9;font-size:13px;font-weight:600;
+  box-shadow:0 2px 8px rgba(39,134,216,.14);
+}
+.m-banner-pill svg{width:12px;height:12px;}
+.m-banner-pill.p-left{left:12px;}
+.m-banner-pill.p-right{right:12px;}
+/* 语言切换行 + 层级筛选（外置） */
+.m-lang-row{
+  display:flex;align-items:center;
+  padding:8px 12px 0;gap:8px;
+}
+.m-lang{
+  display:inline-flex;align-items:center;gap:5px;flex:none;
+  height:28px;padding:0 12px;border-radius:7px;
+  background:#fff;border:1px solid var(--m-line);
+  color:var(--m-text-2);font-size:12px;font-weight:500;
+  box-shadow:0 1px 3px rgba(39,134,216,.06);
+}
+.m-lang svg{width:11px;height:11px;color:var(--m-text-muted);}
+.m-level-btn{
+  margin-left:auto;flex:none;
+  display:inline-flex;align-items:center;gap:5px;
+  height:28px;padding:0 11px;border-radius:14px;
+  background:#fff;border:1px solid rgba(39,134,216,.35);
+  color:var(--m-primary-dark);font-size:11px;font-weight:600;
+  box-shadow:0 1px 4px rgba(39,134,216,.1);
+}
+.m-level-btn svg{width:11px;height:11px;color:var(--m-primary);flex:none;}
+.m-level-btn .lv-val{max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.m-updatetime{
+  margin:6px 14px 0;font-size:10px;color:var(--m-text-muted);
+}
+
+/* ==================== 通用卡片 ==================== */
+.m-card{
+  margin:10px 12px 0;
+  background:var(--m-surface);border-radius:var(--m-radius);
+  box-shadow:var(--m-shadow);
+  overflow:hidden;
+}
+.m-card-head{
+  display:flex;align-items:center;gap:7px;
+  padding:12px 14px 10px;
+  border-bottom:1px solid #f0f5fa;
+}
+.m-card-head .m-ico{
+  width:20px;height:20px;flex:none;display:grid;place-items:center;color:var(--m-primary);
+}
+.m-card-head .m-ico svg{width:17px;height:17px;}
+.m-card-head h2{font-size:15px;font-weight:700;color:var(--m-text);}
+.m-card-head .m-hint{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  background:#f6c244;color:#fff;font-size:10px;font-weight:700;
+  display:grid;place-items:center;
+}
+.m-card-head .m-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.m-card-head .m-note{font-size:10px;color:var(--m-text-muted);white-space:nowrap;}
+.m-card-body{padding:10px 14px 12px;}
+
+/* ==================== KPI 2×2 ==================== */
+.m-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-kpi{
+  border-radius:10px;padding:10px 12px;
+  background:linear-gradient(150deg,#f6faff,#eef5fd);
+  border:1px solid #e6f0fa;
+  display:flex;flex-direction:column;gap:3px;
+  position:relative;overflow:hidden;
+}
+.m-kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.m-kpi.k-blue::before{background:var(--m-primary);}
+.m-kpi.k-green::before{background:var(--m-success);}
+.m-kpi.k-orange::before{background:var(--m-warn);}
+.m-kpi.k-purple::before{background:var(--m-purple);}
+.m-kpi-label{font-size:11px;color:var(--m-text-3);font-weight:500;display:flex;align-items:center;gap:4px;}
+.m-kpi-label svg{width:13px;height:13px;}
+.m-kpi.k-blue .m-kpi-label svg{color:var(--m-primary);}
+.m-kpi.k-green .m-kpi-label svg{color:var(--m-success);}
+.m-kpi.k-orange .m-kpi-label svg{color:var(--m-warn);}
+.m-kpi.k-purple .m-kpi-label svg{color:var(--m-purple);}
+.m-kpi-value{font-family:var(--font-num);font-size:26px;font-weight:700;color:var(--m-text);line-height:1.1;}
+.m-kpi-value .unit{font-family:var(--font-ui);font-size:12px;color:var(--m-text-3);font-weight:400;margin-left:3px;}
+
+/* ==================== 牌照卡 ==================== */
+.m-lic-tools{display:flex;align-items:center;gap:8px;padding:10px 14px 0;}
+.m-legend{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--m-text-3);}
+.m-legend .lg{display:flex;align-items:center;gap:3px;}
+.m-legend .dot{width:6px;height:6px;border-radius:50%;}
+.m-legend .dot.ok{background:var(--m-success);}
+.m-legend .dot.paused{background:var(--m-danger);}
+.m-contractor{margin-left:auto;position:relative;}
+.m-contractor select{
+  height:28px;padding:0 22px 0 8px;max-width:170px;
+  border:1px solid var(--m-line);border-radius:7px;
+  background:#fff;color:var(--m-text-2);font-size:11px;font-family:var(--font-ui);
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2.5' stroke-linecap='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 6px center;
+}
+.m-lic-list{display:flex;flex-direction:column;gap:8px;}
+.m-lic{
+  border-radius:10px;padding:10px 12px;
+  background:linear-gradient(180deg,#fbfdff,#f5f9fe);
+  border:1.5px solid #e2edf8;
+  display:flex;flex-direction:column;gap:7px;
+  position:relative;transition:all .18s ease;
+}
+.m-lic.is-selected{
+  border-color:var(--m-primary);
+  background:linear-gradient(180deg,#eef6ff,#e2effd);
+  box-shadow:0 0 0 3px rgba(39,134,216,.13);
+}
+.m-lic.is-paused{border-color:rgba(255,91,91,.3);}
+.m-lic.is-paused.is-selected{border-color:var(--m-primary);}
+.m-lic-notify{
+  position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;
+  background:var(--m-danger);border:1.5px solid #fff;box-shadow:0 0 0 2px rgba(255,91,91,.2);
+}
+.m-lic-r1{display:flex;align-items:center;gap:6px;min-width:0;}
+.m-lic-name{font-size:14px;font-weight:700;color:var(--m-text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-lic-group{font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(39,134,216,.1);color:var(--m-primary);font-weight:600;flex:none;}
+.m-lic-tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;flex:none;}
+.m-lic-tag.ok{color:var(--m-success);background:rgba(74,203,131,.1);}
+.m-lic-tag.paused{color:var(--m-danger);background:rgba(255,91,91,.1);}
+.m-lic-r2{display:flex;align-items:center;gap:8px;}
+.m-issuer{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:1px 7px;border-radius:3px;font-size:10px;font-weight:600;flex:none;
+}
+.m-issuer.issuer-dev{color:#2786d8;background:rgba(39,134,216,.1);}
+.m-issuer.issuer-bd{color:#9333ea;background:rgba(147,51,234,.1);}
+.m-issuer.issuer-ha{color:#059669;background:rgba(5,150,105,.1);}
+.m-lic-metrics{margin-left:auto;display:flex;gap:14px;}
+.m-lic-metric{display:flex;align-items:baseline;gap:4px;}
+.m-lic-metric .lb{font-size:10px;color:var(--m-text-3);}
+.m-lic-metric .vl{font-family:var(--font-num);font-size:18px;font-weight:700;color:var(--m-text);line-height:1;}
+
+/* ==================== 筛选结果卡 ==================== */
+.m-result{
+  display:none;margin:10px 12px 0;
+  background:#fff;border-radius:12px;
+  border:1px solid rgba(39,134,216,.3);border-left:4px solid var(--m-primary);
+  box-shadow:0 4px 14px rgba(39,134,216,.12);
+  padding:10px 12px;
+  animation:rcIn .22s ease;
+}
+.m-result.is-show{display:block;}
+@keyframes rcIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+.m-result .rc-top{display:flex;align-items:center;gap:6px;min-width:0;}
+.m-result .rc-label{font-size:10px;color:var(--m-text-3);font-weight:600;display:flex;align-items:center;gap:4px;flex:none;}
+.m-result .rc-label svg{width:12px;height:12px;color:var(--m-primary);}
+.m-result .rc-name{font-size:13px;font-weight:700;color:var(--m-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-result .rc-clear{
+  margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:3px;
+  font-size:10px;color:var(--m-text-3);padding:3px 8px;border-radius:6px;
+  border:1px solid var(--m-line);
+}
+.m-result .rc-clear svg{width:10px;height:10px;}
+.m-result .rc-metrics{
+  margin-top:8px;display:flex;gap:0;border-radius:8px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(231,240,250,.7),rgba(255,255,255,.3));
+  border:1px solid var(--m-line);
+}
+.m-result .rc-m{flex:1;padding:6px 4px;text-align:center;border-right:1px solid #eef3f9;}
+.m-result .rc-m:last-child{border-right:0;}
+.m-result .rc-m .lb{font-size:9px;color:var(--m-text-3);}
+.m-result .rc-m .vl{font-family:var(--font-num);font-size:17px;font-weight:700;line-height:1.15;}
+.m-result .rc-m .vl .u{font-family:var(--font-ui);font-size:9px;font-weight:400;color:var(--m-text-3);}
+.m-result .rc-m.m1 .vl{color:var(--m-success);}
+.m-result .rc-m.m2 .vl{color:var(--m-warn);}
+.m-result .rc-m.m3 .vl{color:var(--m-primary);}
+
+/* ==================== Tab 联动区 ==================== */
+.m-tabs{
+  display:flex;align-items:center;
+  padding:10px 14px 0;gap:0;
+  border-bottom:1px solid #f0f5fa;
+}
+.m-tab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 4px 10px;font-size:14px;font-weight:600;color:var(--m-text-3);
+  position:relative;
+}
+.m-tab .tb-count{
+  font-family:var(--font-num);font-size:12px;font-weight:700;
+  min-width:20px;height:18px;padding:0 5px;border-radius:9px;
+  display:inline-grid;place-items:center;
+  background:#eef3f9;color:var(--m-text-3);
+}
+.m-tab.is-active{color:var(--m-primary);}
+.m-tab.is-active::after{
+  content:'';position:absolute;left:20%;right:20%;bottom:-1px;height:3px;border-radius:2px;
+  background:var(--m-primary);
+}
+.m-tab.t-project.is-active{color:#2a9d6f;}
+.m-tab.t-project.is-active::after{background:var(--m-success);}
+.m-tab.t-project.is-active .tb-count{background:rgba(74,203,131,.15);color:#2a9d6f;}
+.m-tab.t-bid.is-active{color:#c97a00;}
+.m-tab.t-bid.is-active::after{background:var(--m-warn);}
+.m-tab.t-bid.is-active .tb-count{background:rgba(232,147,12,.15);color:#c97a00;}
+.m-tab-filter{
+  font-size:9px;color:var(--m-primary);background:rgba(39,134,216,.08);
+  padding:1px 6px;border-radius:8px;white-space:nowrap;
+}
+
+/* Tab 内搜索 */
+.m-pane-tools{padding:10px 14px 0;display:flex;align-items:center;gap:8px;}
+.m-search{position:relative;flex:1;}
+.m-search input{
+  width:100%;height:30px;padding:0 10px 0 28px;
+  border:1px solid var(--m-line);border-radius:8px;
+  background:#f8fbfe;font-size:12px;font-family:var(--font-ui);color:var(--m-text);
+}
+.m-search input:focus{border-color:var(--m-primary);outline:none;background:#fff;}
+.m-search input::placeholder{color:var(--m-text-muted);font-size:11px;}
+.m-search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--m-text-muted);}
+
+/* 联动跳转提示条（第二层） */
+.m-link-hint{
+  display:none;margin:8px 14px 0;padding:6px 10px;border-radius:8px;
+  font-size:11px;align-items:center;gap:6px;
+}
+.m-link-hint.is-show{display:flex;}
+.m-link-hint.h-project{background:rgba(74,203,131,.1);color:#2a9d6f;border:1px solid rgba(74,203,131,.25);}
+.m-link-hint.h-bid{background:rgba(232,147,12,.1);color:#c97a00;border:1px solid rgba(232,147,12,.25);}
+.m-link-hint .x{margin-left:auto;font-size:12px;opacity:.6;padding:0 2px;}
+
+/* ==================== 项目卡片（移动端竖排） ==================== */
+.m-proj{
+  border-radius:10px;padding:10px 12px;margin-bottom:8px;
+  background:#fbfdff;border:1.5px solid #e8f0f9;
+  display:flex;flex-direction:column;gap:6px;
+  transition:all .15s ease;
+}
+.m-proj.is-paused{background:rgba(255,91,91,.04);border-color:rgba(255,91,91,.18);}
+.m-proj.is-match{border-color:var(--m-success);background:linear-gradient(90deg,rgba(74,203,131,.1),rgba(255,255,255,.4));box-shadow:0 0 0 2px rgba(74,203,131,.12);}
+.m-proj.is-dim{opacity:.35;}
+.m-proj-r1{display:flex;align-items:center;gap:6px;}
+.m-proj-code{
+  min-width:36px;height:20px;padding:0 6px;border-radius:4px;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(39,134,216,.1);color:var(--m-primary);
+  font-family:var(--font-num);font-size:11px;font-weight:700;letter-spacing:.03em;
+}
+.m-proj-name{font-size:13px;font-weight:600;color:var(--m-text-2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-proj-status{font-size:10px;padding:1px 6px;border-radius:3px;font-weight:500;flex:none;}
+.m-proj-status.ok{color:var(--m-success);background:rgba(74,203,131,.1);}
+.m-proj-status.paused{color:var(--m-danger);background:rgba(255,91,91,.1);}
+.m-proj-r2{display:flex;align-items:center;gap:10px;font-size:10px;color:var(--m-text-3);}
+.m-proj-r2 .lb{color:var(--m-text-muted);}
+.m-proj-r2 .vl{color:var(--m-text-2);font-weight:500;}
+.m-proj-r2 .vl.num{font-family:var(--font-num);font-weight:600;}
+.m-proj-r3{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.m-plic{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500;line-height:1.5;
+}
+.m-plic .d{width:5px;height:5px;border-radius:50%;flex:none;}
+.m-plic.lic-dev{color:#2786d8;background:rgba(39,134,216,.08);}.m-plic.lic-dev .d{background:#2786d8;}
+.m-plic.lic-bd{color:#9333ea;background:rgba(147,51,234,.08);}.m-plic.lic-bd .d{background:#9333ea;}
+.m-plic.lic-ha{color:#059669;background:rgba(5,150,105,.08);}.m-plic.lic-ha .d{background:#059669;}
+.m-plic .n{color:inherit;}
+
+/* ==================== 投标汇总条（移动端2×2） ==================== */
+.m-bid-summary{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  margin:10px 14px 0;border-radius:10px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(231,240,250,.7),rgba(255,255,255,.3));
+  border:1px solid var(--m-line);
+}
+.m-bs{padding:7px 2px;text-align:center;border-right:1px solid #eef3f9;}
+.m-bs:last-child{border-right:0;}
+.m-bs .lb{font-size:9px;color:var(--m-text-3);font-weight:500;white-space:nowrap;}
+.m-bs .rw{display:flex;align-items:baseline;justify-content:center;gap:4px;margin-top:2px;}
+.m-bs .ct{font-family:var(--font-num);font-size:15px;font-weight:700;color:var(--m-text);line-height:1.1;}
+.m-bs .ct .u{font-family:var(--font-ui);font-size:8px;color:var(--m-text-3);font-weight:400;}
+.m-bs .amt{font-family:var(--font-num);font-size:10px;font-weight:600;color:var(--m-text-muted);}
+.m-bs.a-total .ct{color:var(--m-primary);}
+.m-bs.a-blue .ct{color:var(--m-primary);}
+.m-bs.a-purple .ct{color:var(--m-purple);}
+.m-bs.a-warn .ct{color:var(--m-warn);}
+
+/* ==================== 投标列表项 ==================== */
+.m-bid{
+  display:flex;align-items:center;gap:8px;
+  padding:10px;border-radius:10px;margin-bottom:8px;
+  background:#fbfdff;border:1.5px solid #e8f0f9;
+  transition:all .15s ease;
+}
+.m-bid.is-selected{border-color:var(--m-warn);background:linear-gradient(90deg,rgba(232,147,12,.1),rgba(255,255,255,.4));box-shadow:0 0 0 2px rgba(232,147,12,.12);}
+.m-bid.is-match{border-color:var(--m-warn);background:linear-gradient(90deg,rgba(232,147,12,.1),rgba(255,255,255,.4));box-shadow:0 0 0 2px rgba(232,147,12,.12);}
+.m-bid.is-dim{opacity:.35;}
+.m-bid-ico{
+  width:28px;height:28px;flex:none;border-radius:7px;
+  display:grid;place-items:center;color:var(--m-primary);
+  background:linear-gradient(145deg,#fff,#d5eaff);border:1px solid rgba(104,169,239,.25);
+}
+.m-bid-ico svg{width:14px;height:14px;}
+.m-bid-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.m-bid-r1{display:flex;align-items:center;gap:5px;min-width:0;}
+.m-bid-name{font-size:13px;font-weight:600;color:var(--m-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-bid-r2{display:flex;align-items:center;gap:6px;}
+.m-bid-code{font-size:9px;color:var(--m-text-muted);font-family:var(--font-num);}
+.m-bid-lic{font-size:10px;color:#8b9aab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-bid-right{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.m-bid-status{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;white-space:nowrap;}
+.m-bid-status.info{color:var(--m-primary);background:rgba(39,134,216,.08);}
+.m-bid-status.purple{color:var(--m-purple);background:rgba(147,51,234,.1);}
+.m-bid-status.warn{color:var(--m-warn);background:rgba(232,147,12,.1);}
+.m-bid-amt{font-size:10px;color:var(--m-text-muted);font-family:var(--font-num);font-weight:600;}
+
+.m-empty{padding:26px;text-align:center;color:var(--m-text-muted);font-size:12px;}
+
+/* ==================== 底部操作栏（参考平台样式） ==================== */
+.m-footer{
+  margin-top:14px;padding:10px 0 6px;
+  display:flex;align-items:center;justify-content:center;gap:56px;
+  color:var(--m-text-3);
+}
+.m-footer button{width:34px;height:34px;display:grid;place-items:center;}
+.m-footer svg{width:20px;height:20px;}
+
+/* ==================== 底部弹出 Sheet（页面切换 / 层级） ==================== */
+.m-sheet-mask{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(15,35,60,.4);backdrop-filter:blur(2px);
+}
+.m-sheet-mask.is-open{display:block;}
+.m-sheet{
+  position:absolute;left:0;right:0;bottom:0;
+  max-width:480px;margin:0 auto;
+  background:#fff;border-radius:16px 16px 0 0;
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+  animation:sheetUp .24s ease;
+}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:none;}}
+.m-sheet-title{font-size:14px;font-weight:700;color:var(--m-text);text-align:center;margin-bottom:12px;position:relative;}
+.m-sheet-close{position:absolute;right:0;top:-2px;width:26px;height:26px;display:grid;place-items:center;color:var(--m-text-muted);font-size:16px;}
+.m-sheet-opt{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:12px 12px;border-radius:10px;font-size:14px;font-weight:500;color:var(--m-text-2);
+  border:1px solid var(--m-line);margin-bottom:8px;background:#fbfdff;
+  text-align:left;
+}
+.m-sheet-opt.is-active{
+  border-color:var(--m-primary);color:var(--m-primary);
+  background:rgba(39,134,216,.06);font-weight:600;
+}
+.m-sheet-opt .tick{margin-left:auto;color:var(--m-primary);}
+.m-sheet-opt .tick svg{width:16px;height:16px;}
+
+/* ==================== 全屏弹窗（穿透/申请进度） ==================== */
+.m-modal{
+  display:none;position:fixed;inset:0;z-index:400;background:var(--m-bg);
+  flex-direction:column;
+}
+.m-modal.is-open{display:flex;}
+.m-modal-head{
+  height:48px;flex:none;display:flex;align-items:center;
+  background:#fff;border-bottom:1px solid var(--m-line);padding:0 8px;
+  position:relative;
+}
+.m-modal-head .m-nav-back svg{width:20px;height:20px;}
+.m-modal-title{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-size:15px;font-weight:700;color:var(--m-text);white-space:nowrap;
+  max-width:70%;overflow:hidden;text-overflow:ellipsis;
+}
+.m-modal-body{flex:1;overflow-y:auto;padding:12px;max-width:480px;width:100%;margin:0 auto;}
+.m-drill-item{
+  background:#fff;border:1px solid var(--m-line);border-radius:10px;
+  padding:12px 14px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;
+}
+.m-drill-item .nm{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--m-text-2);}
+.m-drill-item .cnt{font-family:var(--font-num);font-size:22px;font-weight:700;color:var(--m-primary);}
+.m-drill-item .cnt-u{font-size:11px;color:var(--m-text-3);}
+.m-drill-item svg{width:15px;height:15px;color:var(--m-text-muted);flex:none;}
+.m-drill-back{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 10px;border-radius:7px;border:1px solid var(--m-line);
+  font-size:11px;color:var(--m-text-3);background:#fff;margin-bottom:10px;
+}
+.m-drill-back svg{width:11px;height:11px;}
+.m-drill-group{display:flex;align-items:center;gap:6px;margin:10px 0 6px;}
+.m-drill-group .bar{width:3px;height:13px;border-radius:2px;}
+.m-drill-group .tt{font-size:13px;font-weight:700;}
+.m-drill-group .ct{font-size:10px;color:var(--m-text-muted);}
+.m-drill-lic{
+  background:#fff;border:1px solid var(--m-line);border-radius:9px;
+  padding:10px 12px;margin-bottom:6px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.m-drill-lic .r1{display:flex;align-items:center;gap:6px;}
+.m-drill-lic .nm{flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--m-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.m-drill-lic .r2{display:flex;align-items:center;gap:10px;font-size:10px;color:var(--m-text-3);}
+.m-drill-lic .r2 b{font-family:var(--font-num);font-size:14px;color:var(--m-text);}
+
+/* 申请进度卡片 */
+.m-apply-summary{
+  background:rgba(147,51,234,.05);border:1px solid rgba(147,51,234,.15);
+  border-radius:10px;padding:10px 12px;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.m-apply-summary .big{font-family:var(--font-num);font-size:24px;font-weight:700;color:var(--m-purple);}
+.m-apply-summary .big .u{font-family:var(--font-ui);font-size:11px;color:var(--m-text-3);font-weight:400;}
+.m-apply-summary .sg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--m-text-2);}
+.m-apply-summary .sg .d{width:7px;height:7px;border-radius:50%;}
+.m-apply-card{
+  background:#fff;border:1px solid var(--m-line);border-radius:10px;
+  padding:12px;margin-bottom:10px;
+}
+.m-apply-card .r1{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;}
+.m-apply-card .cat{font-size:14px;font-weight:700;color:var(--m-text-2);}
+.m-apply-card .ctr{font-size:10px;color:var(--m-text-muted);}
+.m-apply-steps{display:flex;align-items:flex-start;margin-top:10px;}
+.m-step{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;width:52px;}
+.m-step .dot{
+  width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+  background:#fff;border:2px solid var(--m-line);
+}
+.m-step .dot.done{border:none;}
+.m-step .dot.cur{border:none;box-shadow:0 0 0 3px rgba(39,134,216,.15);}
+.m-step .dot.cur .in{width:7px;height:7px;border-radius:50%;background:#fff;}
+.m-step .tx{font-size:9px;color:var(--m-text-muted);text-align:center;line-height:1.2;}
+.m-step .tx.cur{font-weight:600;}
+.m-step-line{flex:1;height:2px;background:var(--m-line);margin-top:8px;border-radius:1px;}
+</style>
+</head>
+<body>
+<div class="m-app">
+
+  <!-- 顶部导航 -->
+  <div class="m-navbar">
+    <button class="m-nav-back" type="button" aria-label="返回">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="m-nav-title">工程管理大數據平台</span>
+    <button class="m-nav-more" type="button" aria-label="更多">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+    </button>
+  </div>
+
+  <!-- 蓝色波浪横幅（平台统一头部：頁面切換 / 標題 / 功能） -->
+  <div class="m-banner">
+    <svg class="wave" viewBox="0 0 480 78" preserveAspectRatio="none">
+      <path d="M0,38 C90,18 170,58 260,44 C350,30 400,52 480,34 L480,78 L0,78 Z" fill="rgba(255,255,255,.4)"/>
+      <path d="M0,52 C100,34 190,66 280,54 C370,42 420,60 480,48 L480,78 L0,78 Z" fill="rgba(255,255,255,.5)"/>
+    </svg>
+    <span class="m-banner-title">工程管理大數據平台</span>
+    <button class="m-banner-pill p-left" type="button" onclick="openSheet('scope')">頁面切換</button>
+    <button class="m-banner-pill p-right" type="button" onclick="openSheet('func')">功能</button>
+  </div>
+  <div class="m-lang-row">
+    <button class="m-lang" type="button">繁
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <button class="m-level-btn" type="button" onclick="openSheet('level')">
+      <span class="lv-val" id="levelVal">中建香港</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+  <div class="m-updatetime" id="updateTime">最近更新：--</div>
+
+  <!-- KPI 核心指标 -->
+  <div class="m-card">
+    <div class="m-card-head">
+      <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></span>
+      <h2>核心指標</h2>
+      <span class="m-hint">?</span>
+    </div>
+    <div class="m-card-body">
+      <div class="m-kpi-grid">
+        <div class="m-kpi k-blue" onclick="openModal('drill');renderLicenseDrillStep1();">
+          <span class="m-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13l2 2 4-4"/></svg>牌照總數</span>
+          <span class="m-kpi-value">36<span class="unit">張</span></span>
+        </div>
+        <div class="m-kpi k-green">
+          <span class="m-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3-3h5l2 2h8v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 13l2 2 4-4"/></svg>在證項目</span>
+          <span class="m-kpi-value">38<span class="unit">個</span></span>
+        </div>
+        <div class="m-kpi k-orange">
+          <span class="m-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>牌照投標中</span>
+          <span class="m-kpi-value">14<span class="unit">個</span></span>
+        </div>
+        <div class="m-kpi k-purple" onclick="openModal('apply');renderApplyProgress();">
+          <span class="m-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>申請中牌照</span>
+          <span class="m-kpi-value">5<span class="unit">張</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 牌照状态总览 -->
+  <div class="m-card">
+    <div class="m-card-head">
+      <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13l2 2 4-4"/></svg></span>
+      <h2>牌照狀態總覽</h2>
+      <span class="m-hint">?</span>
+      <div class="m-right"><span class="m-note">共 <b id="licTotal" style="color:var(--m-primary);font-family:var(--font-num);font-size:13px;">6</b> 張</span></div>
+    </div>
+    <div class="m-lic-tools">
+      <div class="m-legend">
+        <span class="lg"><span class="dot ok"></span>正常</span>
+        <span class="lg"><span class="dot paused"></span>暫停</span>
+      </div>
+      <div class="m-contractor">
+        <select id="contractorFilter" onchange="filterByContractor()">
+          <option value="">全部承建商</option>
+          <option value="c1">中國建築工程（香港）</option>
+          <option value="c2">中國海外房屋工程</option>
+          <option value="c3">中國海外土木工程</option>
+          <option value="c4">遠東建築</option>
+          <option value="c5">寶嘉建業</option>
+        </select>
+      </div>
+    </div>
+    <div class="m-card-body">
+      <div class="m-lic-list" id="licenseList"></div>
+    </div>
+  </div>
+
+  <!-- 筛选结果卡（第一层联动） -->
+  <div class="m-result" id="resultCard"></div>
+
+  <!-- Tab 联动区：在建項目 / 關聯投標 -->
+  <div class="m-card">
+    <div class="m-tabs">
+      <button class="m-tab t-project is-active" id="tabProject" type="button" onclick="switchTab('project')">
+        在建項目<span class="tb-count" id="tabProjectCount">7</span>
+        <span class="m-tab-filter" id="tabProjectFilter" style="display:none;">已過濾</span>
+      </button>
+      <button class="m-tab t-bid" id="tabBid" type="button" onclick="switchTab('bid')">
+        關聯投標<span class="tb-count" id="tabBidCount">9</span>
+        <span class="m-tab-filter" id="tabBidFilter" style="display:none;">已過濾</span>
+      </button>
+    </div>
+
+    <!-- 联动跳转提示（第二层） -->
+    <div class="m-link-hint" id="linkHint"></div>
+
+    <!-- 项目面板 -->
+    <div id="paneProject">
+      <div class="m-pane-tools">
+        <div class="m-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="projectSearch" placeholder="搜尋項目編號/名稱/經理" oninput="filterProjects()">
+        </div>
+      </div>
+      <div class="m-card-body" id="projectList"></div>
+    </div>
+
+    <!-- 投标面板 -->
+    <div id="paneBid" style="display:none;">
+      <div class="m-pane-tools">
+        <div class="m-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="bidSearch" placeholder="搜尋投標編號/名稱" oninput="filterBids()">
+        </div>
+      </div>
+      <div class="m-bid-summary" id="bidSummaryBar"></div>
+      <div class="m-card-body" id="bidList"></div>
+    </div>
+  </div>
+
+  <!-- 底部操作栏 -->
+  <div class="m-footer">
+    <button type="button" aria-label="刷新" onclick="updateTime(true)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+    <button type="button" aria-label="分享">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    </button>
+    <button type="button" aria-label="應用">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<!-- 底部 Sheet -->
+<div class="m-sheet-mask" id="sheetMask" onclick="if(event.target===this)closeSheet()">
+  <div class="m-sheet">
+    <div class="m-sheet-title" id="sheetTitle">頁面切換
+      <button class="m-sheet-close" type="button" onclick="closeSheet()">✕</button>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- 全屏弹窗：牌照穿透 -->
+<div class="m-modal" id="modalDrill">
+  <div class="m-modal-head">
+    <button class="m-nav-back" type="button" onclick="closeModal('drill')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="m-modal-title" id="drillTitle">牌照總數穿透</span>
+  </div>
+  <div class="m-modal-body" id="drillBody"></div>
+</div>
+
+<!-- 全屏弹窗：申请进度 -->
+<div class="m-modal" id="modalApply">
+  <div class="m-modal-head">
+    <button class="m-nav-back" type="button" onclick="closeModal('apply')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="m-modal-title">正在申請牌照進度</span>
+  </div>
+  <div class="m-modal-body" id="applyBody"></div>
+</div>
+
+<script>
+/* ==================== 数据（与桌面版完全一致） ==================== */
+var licenseData = [
+  {id:'l1', name:'建築', group:'丙組', issuer:'發展局', count:9, bidCount:1, status:'ok', notify:true},
+  {id:'l2', name:'鋼筋及混凝土', group:'丙組', issuer:'發展局', count:6, bidCount:7, status:'ok', notify:true},
+  {id:'l3', name:'地盤平整', group:'丙組', issuer:'發展局', count:3, bidCount:1, status:'ok', notify:false},
+  {id:'l4', name:'建築（新工程類）/NW2', group:null, issuer:'房委會', count:5, bidCount:1, status:'paused', notify:false},
+  {id:'l5', name:'打樁工程-大口徑鑽孔灌注樁', group:null, issuer:'發展局', count:3, bidCount:0, status:'ok', notify:false},
+  {id:'l6', name:'註冊一般承建商(RGBC)', group:null, issuer:'屋宇署', count:12, bidCount:4, status:'paused', notify:true}
+];
+
+var issuerClassMap = {'發展局':'issuer-dev','屋宇署':'issuer-bd','房委會':'issuer-ha'};
+var licTagClassMap = {'發展局':'lic-dev','屋宇署':'lic-bd','房委會':'lic-ha'};
+
+var projectData = [
+  {id:'p1', code:'BMW', name:'天璽工程', licenses:['l1','l2','l4'], status:'paused', statusText:'暫停', manager:'陳志明', contractAmount:'4.2億', completion:'2027-06'},
+  {id:'p2', code:'SFW', name:'小蠔灣填海及發展', licenses:['l1','l3','l5'], status:'paused', statusText:'暫停', manager:'李建華', contractAmount:'6.8億', completion:'2028-03'},
+  {id:'p3', code:'WKW', name:'西九文化區住宅', licenses:['l1','l2'], status:'paused', statusText:'暫停', manager:'王國強', contractAmount:'3.5億', completion:'2026-12'},
+  {id:'p4', code:'KTD', name:'啟德體育園配套', licenses:['l1','l4','l6'], status:'ok', statusText:'正常', manager:'張偉文', contractAmount:'5.1億', completion:'2027-09'},
+  {id:'p5', code:'NLC', name:'北大嶼山公路擴建', licenses:['l3','l5'], status:'ok', statusText:'正常', manager:'劉志偉', contractAmount:'2.7億', completion:'2026-11'},
+  {id:'p6', code:'AEX', name:'機場擴建項目', licenses:['l1','l2','l6'], status:'ok', statusText:'正常', manager:'黃永祥', contractAmount:'8.3億', completion:'2028-06'},
+  {id:'p7', code:'TUC', name:'東涌新市鎮擴展', licenses:['l1','l4'], status:'ok', statusText:'正常', manager:'趙海峰', contractAmount:'4.6億', completion:'2027-12'}
+];
+
+var licenseApplyData = [
+  {id:'a1', contractor:'中國建築工程（香港）', category:'建築', group:'丙組', issuer:'發展局', stage:'準備材料'},
+  {id:'a2', contractor:'中國海外房屋工程', category:'地盤平整', group:'丙組', issuer:'發展局', stage:'已提交'},
+  {id:'a3', contractor:'中國建築工程（香港）', category:'鋼筋及混凝土', group:'丙組', issuer:'發展局', stage:'面試安排中'},
+  {id:'a4', contractor:'遠東建築', category:'註冊一般承建商(RGBC)', group:'-', issuer:'屋宇署', stage:'準備材料'},
+  {id:'a5', contractor:'寶嘉建業', category:'打樁工程-大口徑鑽孔灌注樁', group:'丙組', issuer:'發展局', stage:'已提交'}
+];
+
+var bidData = [
+  {id:'b1', name:'寶豐路二期', bidCode:'BID-2026-001', status:'info', statusText:'正在投標', license:'l1', amount:3.2},
+  {id:'b2', name:'古洞北二期', bidCode:'BID-2026-002', status:'info', statusText:'正在投標', license:'l3', amount:5.6},
+  {id:'b3', name:'小蠔灣發展', bidCode:'BID-2026-003', status:'info', statusText:'正在投標', license:'l4', amount:8.1},
+  {id:'b4', name:'天文台擴建', bidCode:'BID-2026-004', status:'purple', statusText:'資格預審', license:'l2', amount:2.4},
+  {id:'b5', name:'魷魚灣基建', bidCode:'BID-2026-005', status:'purple', statusText:'資格預審', license:'l6', amount:4.8},
+  {id:'b6', name:'西貢公路改造', bidCode:'BID-2026-006', status:'warn', statusText:'已交標', license:'l1', amount:1.9},
+  {id:'b7', name:'I·Park2', bidCode:'BID-2025-101', status:'warn', statusText:'已交標', license:'l1', amount:6.5},
+  {id:'b8', name:'133C', bidCode:'BID-2025-102', status:'warn', statusText:'已交標', license:'l6', amount:3.7},
+  {id:'b9', name:'133A', bidCode:'BID-2025-103', status:'warn', statusText:'已交標', license:'l1', amount:4.2}
+];
+
+var licenseMap = {};
+licenseData.forEach(function(l){ licenseMap[l.id] = l; });
+
+/* ==================== 状态 ==================== */
+var selectedLicenseId = null;
+var selectedProjectId = null;
+var selectedBidId = null;
+var activeTab = 'project';
+var currentLevel = '中建香港';
+var currentScope = '牌照監控駕駛艙';
+var projectSearchKey = '';
+var bidSearchKey = '';
+var selectedContractor = '';
+
+/* ==================== Tab 切换 ==================== */
+function switchTab(tab){
+  activeTab = tab;
+  document.getElementById('tabProject').classList.toggle('is-active', tab==='project');
+  document.getElementById('tabBid').classList.toggle('is-active', tab==='bid');
+  document.getElementById('paneProject').style.display = tab==='project' ? '' : 'none';
+  document.getElementById('paneBid').style.display = tab==='bid' ? '' : 'none';
+}
+
+/* ==================== 联动提示条（第二层） ==================== */
+function renderLinkHint(){
+  var el = document.getElementById('linkHint');
+  if(selectedProjectId){
+    var p = projectData.find(function(x){ return x.id===selectedProjectId; });
+    var n = bidData.filter(function(b){ return p && p.licenses.indexOf(b.license)!==-1; }).length;
+    el.className = 'm-link-hint is-show h-bid';
+    el.innerHTML = '已定位「'+p.name+'」綁定的 <b>'+n+'</b> 個投標項目（橙色高亮）<span class="x" onclick="clearLayer2()">✕</span>';
+  } else if(selectedBidId){
+    var b = bidData.find(function(x){ return x.id===selectedBidId; });
+    var m = projectData.filter(function(p){ return p.licenses.indexOf(b.license)!==-1; }).length;
+    el.className = 'm-link-hint is-show h-project';
+    el.innerHTML = '已定位「'+b.name+'」關聯的 <b>'+m+'</b> 個在建項目（綠色高亮）<span class="x" onclick="clearLayer2()">✕</span>';
+  } else {
+    el.className = 'm-link-hint';
+    el.innerHTML = '';
+  }
+}
+function clearLayer2(){
+  selectedProjectId = null;
+  selectedBidId = null;
+  renderAll();
+}
+
+/* ==================== 筛选结果卡（第一层） ==================== */
+function renderResultCard(){
+  var card = document.getElementById('resultCard');
+  if(!selectedLicenseId){
+    card.classList.remove('is-show');
+    card.innerHTML = '';
+    return;
+  }
+  var l = licenseMap[selectedLicenseId];
+  var issuerCls = issuerClassMap[l.issuer] || 'issuer-dev';
+  var mp = projectData.filter(function(p){ return p.licenses.indexOf(selectedLicenseId)!==-1; });
+  var mb = bidData.filter(function(b){ return b.license===selectedLicenseId; });
+  var amt = mb.reduce(function(s,b){ return s+(b.amount||0); },0);
+  var statusCls = l.status==='ok'?'ok':'paused';
+  var statusText = l.status==='ok'?'正常':'暫停';
+
+  var html = '';
+  html += '<div class="rc-top">';
+  html += '<span class="rc-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>篩選結果</span>';
+  html += '<span class="rc-name">'+l.name+'</span>';
+  if(l.group) html += '<span class="m-lic-group">'+l.group+'</span>';
+  html += '<span class="m-issuer '+issuerCls+'">'+l.issuer+'</span>';
+  html += '<span class="m-lic-tag '+statusCls+'">'+statusText+'</span>';
+  if(l.notify) html += '<span style="font-size:9px;color:var(--m-danger);font-weight:600;flex:none;">● 需通報</span>';
+  html += '<button class="rc-clear" type="button" onclick="clearLicenseFilter()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>清除</button>';
+  html += '</div>';
+  html += '<div class="rc-metrics">';
+  html += '<div class="rc-m m1"><div class="lb">在證項目</div><div class="vl">'+mp.length+'<span class="u"> 個</span></div></div>';
+  html += '<div class="rc-m m2"><div class="lb">關聯投標</div><div class="vl">'+mb.length+'<span class="u"> 個</span></div></div>';
+  html += '<div class="rc-m m3"><div class="lb">投標總額</div><div class="vl">'+amt.toFixed(1)+'<span class="u"> 億</span></div></div>';
+  html += '</div>';
+  card.innerHTML = html;
+  card.classList.add('is-show');
+}
+function clearLicenseFilter(){
+  selectedLicenseId = null;
+  renderAll();
+}
+
+/* ==================== 渲染：牌照列表 ==================== */
+function renderLicenseList(){
+  var filteredLicenses = licenseData;
+  if(selectedContractor){
+    var contractorLicenses = {
+      'c1': ['l1','l2','l3','l4','l5','l6'],
+      'c2': ['l1','l2','l4','l6'],
+      'c3': ['l1','l3','l5'],
+      'c4': ['l1','l2','l4'],
+      'c5': ['l1','l3','l6']
+    };
+    var allowIds = contractorLicenses[selectedContractor] || [];
+    filteredLicenses = licenseData.filter(function(l){ return allowIds.indexOf(l.id)!==-1; });
+  }
+  document.getElementById('licTotal').textContent = filteredLicenses.length;
+
+  var html = '';
+  filteredLicenses.forEach(function(l){
+    var cls = '';
+    if(l.status==='paused') cls = 'is-paused';
+    if(selectedLicenseId===l.id) cls += ' is-selected';
+    var tagCls = l.status==='ok'?'ok':'paused';
+    var tagText = l.status==='ok'?'正常':'暫停';
+    var issuerCls = issuerClassMap[l.issuer] || 'issuer-dev';
+
+    html += '<div class="m-lic '+cls+'" onclick="selectLicense(\''+l.id+'\')">';
+    if(l.notify) html += '<div class="m-lic-notify" title="需通報"></div>';
+    html += '<div class="m-lic-r1">';
+    html += '<span class="m-lic-name">'+l.name+'</span>';
+    if(l.group) html += '<span class="m-lic-group">'+l.group+'</span>';
+    html += '<span class="m-lic-tag '+tagCls+'">'+tagText+'</span>';
+    html += '</div>';
+    html += '<div class="m-lic-r2">';
+    html += '<span class="m-issuer '+issuerCls+'">'+l.issuer+'</span>';
+    html += '<div class="m-lic-metrics">';
+    html += '<span class="m-lic-metric"><span class="lb">在證項目</span><span class="vl">'+l.count+'</span></span>';
+    html += '<span class="m-lic-metric"><span class="lb">牌照投標</span><span class="vl">'+l.bidCount+'</span></span>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  document.getElementById('licenseList').innerHTML = html;
+}
+
+/* ==================== 渲染：项目列表 ==================== */
+function getFilteredProjects(){
+  var filtered = projectData;
+  if(selectedLicenseId){
+    filtered = filtered.filter(function(p){ return p.licenses.indexOf(selectedLicenseId)!==-1; });
+  }
+  if(projectSearchKey){
+    var key = projectSearchKey.toLowerCase();
+    filtered = filtered.filter(function(p){
+      return p.name.toLowerCase().indexOf(key)!==-1 ||
+             p.code.toLowerCase().indexOf(key)!==-1 ||
+             p.manager.toLowerCase().indexOf(key)!==-1;
+    });
+  }
+  return filtered;
+}
+function renderProjectList(){
+  var filtered = getFilteredProjects();
+  document.getElementById('tabProjectCount').textContent = filtered.length;
+  document.getElementById('tabProjectFilter').style.display = selectedLicenseId ? '' : 'none';
+
+  var selectedBidLicense = null;
+  if(selectedBidId){
+    var sb = bidData.find(function(b){ return b.id===selectedBidId; });
+    if(sb) selectedBidLicense = sb.license;
+  }
+
+  var html = '';
+  filtered.forEach(function(p){
+    var cls = '';
+    if(p.status==='paused') cls = 'is-paused';
+    if(selectedBidLicense){
+      cls += (p.licenses.indexOf(selectedBidLicense)!==-1) ? ' is-match' : ' is-dim';
+    }
+    if(selectedProjectId===p.id) cls += ' is-match';
+
+    html += '<div class="m-proj '+cls+'" onclick="selectProject(\''+p.id+'\')">';
+    html += '<div class="m-proj-r1">';
+    html += '<span class="m-proj-code">'+p.code+'</span>';
+    html += '<span class="m-proj-name">'+p.name+'</span>';
+    html += '<span class="m-proj-status '+p.status+'">'+p.statusText+'</span>';
+    html += '</div>';
+    html += '<div class="m-proj-r2">';
+    html += '<span><span class="lb">經理 </span><span class="vl">'+p.manager+'</span></span>';
+    html += '<span><span class="lb">合約 </span><span class="vl num">'+p.contractAmount+'</span></span>';
+    html += '<span><span class="lb">完工 </span><span class="vl num">'+p.completion+'</span></span>';
+    html += '</div>';
+    html += '<div class="m-proj-r3">';
+    p.licenses.forEach(function(lid){
+      var lic = licenseMap[lid];
+      if(!lic) return;
+      var tc = licTagClassMap[lic.issuer] || 'lic-dev';
+      html += '<span class="m-plic '+tc+'" title="'+lic.issuer+' · '+lic.name+'" onclick="event.stopPropagation();selectLicense(\''+lid+'\')">';
+      html += '<span class="d"></span><span class="n">'+lic.name+'</span>';
+      html += '</span>';
+    });
+    html += '</div>';
+    html += '</div>';
+  });
+  if(filtered.length===0){
+    html = '<div class="m-empty">未找到匹配項目</div>';
+  }
+  document.getElementById('projectList').innerHTML = html;
+}
+
+/* ==================== 渲染：投标列表 ==================== */
+function getFilteredBids(){
+  var bids = bidData;
+  if(selectedLicenseId){
+    bids = bids.filter(function(b){ return b.license===selectedLicenseId; });
+  }
+  if(bidSearchKey){
+    var key = bidSearchKey.toLowerCase();
+    bids = bids.filter(function(b){
+      return b.name.toLowerCase().indexOf(key)!==-1 ||
+             b.bidCode.toLowerCase().indexOf(key)!==-1;
+    });
+  }
+  return bids;
+}
+function renderBidList(){
+  var bids = getFilteredBids();
+  document.getElementById('tabBidCount').textContent = bids.length;
+  document.getElementById('tabBidFilter').style.display = selectedLicenseId ? '' : 'none';
+
+  var projectLicenses = null;
+  if(selectedProjectId){
+    var sp = projectData.find(function(p){ return p.id===selectedProjectId; });
+    if(sp) projectLicenses = sp.licenses;
+  }
+
+  /* 汇总范围随联动选择变动 */
+  var summaryBids = bids;
+  if(projectLicenses){
+    summaryBids = bids.filter(function(b){ return projectLicenses.indexOf(b.license)!==-1; });
+  } else if(selectedBidId){
+    summaryBids = bids.filter(function(b){ return b.id===selectedBidId; });
+  }
+  var g1 = summaryBids.filter(function(b){return b.status==='info';});
+  var g2 = summaryBids.filter(function(b){return b.status==='purple';});
+  var g3 = summaryBids.filter(function(b){return b.status==='warn';});
+  var sum = function(arr){ return arr.reduce(function(s,b){return s+(b.amount||0);},0); };
+  var sh = '';
+  sh += '<div class="m-bs a-total"><div class="lb">總計</div><div class="rw"><span class="ct">'+summaryBids.length+'<span class="u">個</span></span><span class="amt">'+sum(summaryBids).toFixed(1)+'億</span></div></div>';
+  sh += '<div class="m-bs a-blue"><div class="lb">正在投標</div><div class="rw"><span class="ct">'+g1.length+'<span class="u">個</span></span><span class="amt">'+sum(g1).toFixed(1)+'億</span></div></div>';
+  sh += '<div class="m-bs a-purple"><div class="lb">資格預審</div><div class="rw"><span class="ct">'+g2.length+'<span class="u">個</span></span><span class="amt">'+sum(g2).toFixed(1)+'億</span></div></div>';
+  sh += '<div class="m-bs a-warn"><div class="lb">已交標</div><div class="rw"><span class="ct">'+g3.length+'<span class="u">個</span></span><span class="amt">'+sum(g3).toFixed(1)+'億</span></div></div>';
+  document.getElementById('bidSummaryBar').innerHTML = sh;
+
+  var html = '';
+  bids.forEach(function(b){
+    var lic = licenseMap[b.license];
+    var licName = lic ? lic.name : '';
+    var licIssuer = lic ? lic.issuer : '';
+    var issuerCls = issuerClassMap[licIssuer] || 'issuer-dev';
+    var cls = '';
+    if(selectedBidId===b.id) cls += ' is-selected';
+    if(projectLicenses){
+      cls += (projectLicenses.indexOf(b.license)!==-1) ? ' is-match' : ' is-dim';
+    }
+    html += '<div class="m-bid'+cls+'" onclick="selectBid(\''+b.id+'\')">';
+    html += '<div class="m-bid-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>';
+    html += '<div class="m-bid-main">';
+    html += '<div class="m-bid-r1">';
+    html += '<span class="m-bid-name">'+b.name+'</span>';
+    if(licIssuer) html += '<span class="m-issuer '+issuerCls+'" style="font-size:9px;">'+licIssuer+'</span>';
+    html += '</div>';
+    html += '<div class="m-bid-r2">';
+    html += '<span class="m-bid-code">'+b.bidCode+'</span>';
+    if(licName) html += '<span class="m-bid-lic">'+licName+'</span>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="m-bid-right">';
+    html += '<span class="m-bid-status '+b.status+'">'+b.statusText+'</span>';
+    if(b.amount) html += '<span class="m-bid-amt">'+b.amount.toFixed(1)+'億</span>';
+    html += '</div>';
+    html += '</div>';
+  });
+  if(bids.length===0){
+    html = '<div class="m-empty">暫無關聯投標項目</div>';
+  }
+  document.getElementById('bidList').innerHTML = html;
+}
+
+function renderAll(){
+  renderLicenseList();
+  renderResultCard();
+  renderProjectList();
+  renderBidList();
+  renderLinkHint();
+}
+
+/* ==================== 交互：两层联动（移动端：自动跳转对方Tab） ==================== */
+function filterProjects(){
+  projectSearchKey = document.getElementById('projectSearch').value.trim();
+  renderProjectList();
+}
+function filterBids(){
+  bidSearchKey = document.getElementById('bidSearch').value.trim();
+  renderBidList();
+}
+function filterByContractor(){
+  selectedContractor = document.getElementById('contractorFilter').value;
+  renderLicenseList();
+}
+
+/* 第一层：点牌照 → 结果卡 + 双列表过滤 */
+function selectLicense(lid){
+  selectedLicenseId = (selectedLicenseId===lid) ? null : lid;
+  selectedProjectId = null;
+  selectedBidId = null;
+  renderAll();
+  if(selectedLicenseId){
+    document.getElementById('resultCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+/* 第二层：点项目 → 自动切到投标Tab并高亮绑定投标 */
+function selectProject(pid){
+  var willSelect = (selectedProjectId!==pid);
+  selectedProjectId = willSelect ? pid : null;
+  selectedLicenseId = null;
+  selectedBidId = null;
+  renderAll();
+  if(willSelect) switchTab('bid');
+}
+
+/* 第二层：点投标 → 自动切回项目Tab并高亮关联项目 */
+function selectBid(bidId){
+  var willSelect = (selectedBidId!==bidId);
+  selectedBidId = willSelect ? bidId : null;
+  selectedLicenseId = null;
+  selectedProjectId = null;
+  renderAll();
+  if(willSelect) switchTab('project');
+}
+
+/* ==================== 底部 Sheet ==================== */
+var sheetType = 'scope';
+function openSheet(type){
+  sheetType = type;
+  var title = document.getElementById('sheetTitle');
+  var body = document.getElementById('sheetBody');
+  var opts, current;
+  if(type==='scope' || type==='level'){
+    if(type==='scope'){
+      title.childNodes[0].textContent = '頁面切換';
+      opts = ['牌照監控駕駛艙','中建香港駕駛艙','工程部','大團隊看板','地盤駕駛艙'];
+      current = currentScope;
+    } else {
+      title.childNodes[0].textContent = '層級切換';
+      opts = ['中建香港','房屋工程部','醫療工程部','機電工程部','土木工程部','基礎工程部'];
+      current = currentLevel;
+    }
+    var html = '';
+    opts.forEach(function(o){
+      var active = (o===current);
+      html += '<button class="m-sheet-opt'+(active?' is-active':'')+'" type="button" onclick="pickSheetOpt(\''+o+'\')">';
+      html += o;
+      if(active) html += '<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+      html += '</button>';
+    });
+    body.innerHTML = html;
+  } else {
+    /* 功能入口（层级筛选已外置到页面） */
+    title.childNodes[0].textContent = '功能';
+    var fhtml = '';
+    fhtml += '<button class="m-sheet-opt" type="button" onclick="funcAction(\'drill\')">牌照總數穿透（按承建商）</button>';
+    fhtml += '<button class="m-sheet-opt" type="button" onclick="funcAction(\'apply\')">申請中牌照進度</button>';
+    body.innerHTML = fhtml;
+  }
+  document.getElementById('sheetMask').classList.add('is-open');
+}
+function funcAction(a){
+  closeSheet();
+  if(a==='drill'){ openModal('drill'); renderLicenseDrillStep1(); }
+  else if(a==='apply'){ openModal('apply'); renderApplyProgress(); }
+}
+/* 层级由底部 Sheet 选择，currentLevel 在 pickSheetOpt 中更新 */
+function pickSheetOpt(val){
+  if(sheetType==='scope'){
+    currentScope = val;
+  } else if(sheetType==='level'){
+    currentLevel = val;
+    document.getElementById('levelVal').textContent = val;
+  }
+  closeSheet();
+}
+function closeSheet(){
+  document.getElementById('sheetMask').classList.remove('is-open');
+}
+
+/* ==================== 全屏弹窗 ==================== */
+function openModal(which){
+  document.getElementById(which==='drill'?'modalDrill':'modalApply').classList.add('is-open');
+}
+function closeModal(which){
+  document.getElementById(which==='drill'?'modalDrill':'modalApply').classList.remove('is-open');
+}
+
+/* 牌照总数穿透 */
+function renderLicenseDrillStep1(){
+  document.getElementById('drillTitle').textContent = '牌照總數穿透 · 承建商';
+  var contractors = [
+    {id:'c1', name:'中國建築工程（香港）', licenseIds:['l1','l2','l3','l4','l5','l6']},
+    {id:'c2', name:'中國海外房屋工程', licenseIds:['l1','l2','l4','l6']},
+    {id:'c3', name:'中國海外土木工程', licenseIds:['l1','l3','l5']},
+    {id:'c4', name:'遠東建築', licenseIds:['l1','l2','l4']},
+    {id:'c5', name:'寶嘉建業', licenseIds:['l1','l3','l6']}
+  ];
+  var html = '<div style="font-size:11px;color:var(--m-text-3);margin-bottom:10px;">點擊承建商查看其持有牌照清單</div>';
+  contractors.forEach(function(c){
+    html += '<div class="m-drill-item" onclick="renderLicenseDrillStep2(\''+c.id+'\')">';
+    html += '<span class="nm">'+c.name+'</span>';
+    html += '<span class="cnt">'+c.licenseIds.length+'</span><span class="cnt-u">張牌照</span>';
+    html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+    html += '</div>';
+  });
+  document.getElementById('drillBody').innerHTML = html;
+}
+function renderLicenseDrillStep2(contractorId){
+  var contractorNames = {'c1':'中國建築工程（香港）','c2':'中國海外房屋工程','c3':'中國海外土木工程','c4':'遠東建築','c5':'寶嘉建業'};
+  var contractorLicenses = {
+    'c1': ['l1','l2','l3','l4','l5','l6'],
+    'c2': ['l1','l2','l4','l6'],
+    'c3': ['l1','l3','l5'],
+    'c4': ['l1','l2','l4'],
+    'c5': ['l1','l3','l6']
+  };
+  var cname = contractorNames[contractorId] || '';
+  var licIds = contractorLicenses[contractorId] || [];
+  document.getElementById('drillTitle').textContent = cname;
+  var groups = {};
+  var issuerOrder = ['發展局','屋宇署','房委會'];
+  var issuerColors = {'發展局':'var(--m-primary)','屋宇署':'var(--m-purple)','房委會':'var(--m-success)'};
+  licIds.forEach(function(lid){
+    var l = licenseMap[lid];
+    if(!l) return;
+    if(!groups[l.issuer]) groups[l.issuer] = [];
+    groups[l.issuer].push(l);
+  });
+  var html = '';
+  html += '<button class="m-drill-back" type="button" onclick="renderLicenseDrillStep1()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>返回承建商列表 · 共 '+licIds.length+' 張</button>';
+  issuerOrder.forEach(function(issuer){
+    if(!groups[issuer]) return;
+    var list = groups[issuer];
+    var color = issuerColors[issuer];
+    html += '<div class="m-drill-group"><span class="bar" style="background:'+color+';"></span><span class="tt" style="color:'+color+';">'+issuer+'</span><span class="ct">('+list.length+'張)</span></div>';
+    list.forEach(function(l){
+      var statusText = l.status==='ok'?'正常':'暫停';
+      var statusCls = l.status==='ok'?'ok':'paused';
+      html += '<div class="m-drill-lic">';
+      html += '<div class="r1"><span class="nm">'+l.name+'</span>';
+      if(l.group) html += '<span class="m-lic-group">'+l.group+'</span>';
+      html += '<span class="m-lic-tag '+statusCls+'">'+statusText+'</span></div>';
+      html += '<div class="r2"><span>在證項目 <b>'+l.count+'</b></span><span>牌照投標 <b>'+l.bidCount+'</b></span></div>';
+      html += '</div>';
+    });
+  });
+  document.getElementById('drillBody').innerHTML = html;
+}
+
+/* 申请进度 */
+function renderApplyProgress(){
+  var stages = ['準備材料','已提交','面試安排中','完成申請'];
+  var stageColors = {'準備材料':'#e8930c','已提交':'#2786d8','面試安排中':'#9333ea','完成申請':'#4acb83'};
+  var issuerColors = {'發展局':'#2786d8','屋宇署':'#9333ea','房委會':'#059669'};
+  var stageCounts = {};
+  licenseApplyData.forEach(function(a){ stageCounts[a.stage]=(stageCounts[a.stage]||0)+1; });
+
+  var html = '';
+  html += '<div class="m-apply-summary">';
+  html += '<span class="big">'+licenseApplyData.length+'<span class="u"> 張申請中</span></span>';
+  stages.forEach(function(s){
+    if(!stageCounts[s]) return;
+    html += '<span class="sg"><span class="d" style="background:'+stageColors[s]+';"></span>'+s+' '+stageCounts[s]+'</span>';
+  });
+  html += '</div>';
+
+  licenseApplyData.forEach(function(a){
+    var cur = stages.indexOf(a.stage);
+    var ic = issuerColors[a.issuer] || '#2786d8';
+    html += '<div class="m-apply-card">';
+    html += '<div class="r1">';
+    html += '<span class="cat">'+a.category+'</span>';
+    if(a.group!=='-') html += '<span class="m-lic-group">'+a.group+'</span>';
+    html += '<span class="m-issuer" style="color:'+ic+';background:'+ic+'1a;">'+a.issuer+'</span>';
+    html += '</div>';
+    html += '<div class="ctr">'+a.contractor+'</div>';
+    html += '<div class="m-apply-steps">';
+    stages.forEach(function(s, idx){
+      var color = stageColors[s];
+      var done = idx<cur, isCur = idx===cur;
+      html += '<div class="m-step">';
+      if(done){
+        html += '<span class="dot done" style="background:'+color+';"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+      } else if(isCur){
+        html += '<span class="dot cur" style="background:'+color+';"><span class="in"></span></span>';
+      } else {
+        html += '<span class="dot"></span>';
+      }
+      html += '<span class="tx'+(isCur?' cur':'')+'"'+(isCur?' style="color:'+color+';"':'')+'>'+s+'</span>';
+      html += '</div>';
+      if(idx<stages.length-1){
+        html += '<span class="m-step-line"'+(idx<cur?' style="background:'+stageColors[stages[idx]]+';"':'')+'></span>';
+      }
+    });
+    html += '</div>';
+    html += '</div>';
+  });
+  document.getElementById('applyBody').innerHTML = html;
+}
+
+/* ==================== 时间 ==================== */
+function updateTime(){
+  var now = new Date();
+  var p = function(n){ return String(n).padStart(2,'0'); };
+  document.getElementById('updateTime').textContent =
+    '最近更新：'+now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+}
+
+/* ==================== 初始化 ==================== */
+renderAll();
+switchTab('project');
+updateTime();
+setInterval(updateTime, 1000);
+</script>
+</body>
+</html>
